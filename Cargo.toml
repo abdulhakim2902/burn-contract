@@ -1,0 +1,22 @@
+[package]
+name = "burn-token"
+version = "0.1.0"
+authors = ["Debio"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = "5.1.0"
+serde = "1.0.203"
+borsh = "1.5.1"
+
+[profile.release]
+codegen-units = 1
+# Tell `rustc` to optimize for small code size.
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true
