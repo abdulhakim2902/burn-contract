@@ -15,7 +15,7 @@ To build run:
 To deploy run:
 
 ```shell
-near deploy dbio-burn1.testnet out/main.wasm --initFunction new --initArgs '{"token_id": "debio-token3.testnet"}'
+near deploy dbio-burn1.testnet out/main.wasm --initFunction new --initArgs ''
 ```
 
 Get account session:
@@ -27,25 +27,17 @@ near view dbio-burn1.testnet get_account_session '{"account_id": "abdulhakim.tes
 Response
 ```bash
 {
-  "amount": "100000000000", // total burn
-  "session": "100000000000" // total session
+  "burn_amount": 100000000000
+  "session": 100000000000
 }
 ```
 
-Get token id:
-```bash
-near view dbio-burn1.testnet get_token_id
-```
-Response
-```bash
-dbio-burn1.tesnet
-```
-
 Burn
+
 ```bash
 near call dbio-burn1.testnet burn '{"amount": "10000"}' --accountId abdulhakim.testnet --depositYocto 1
 ```
 
 ENV
-- burn contract: dbio-burn1.testnet
+- burn contract: dbio-burn1.testnet, dbio-burn2.testnet
 - token contract: debio-token3.testnet
