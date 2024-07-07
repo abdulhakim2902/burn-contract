@@ -15,13 +15,13 @@ To build run:
 To deploy run:
 
 ```shell
-near deploy dbio-burn1.testnet out/main.wasm --initFunction new --initArgs ''
+near deploy dbio-burn3.testnet out/main.wasm --initFunction new --initArgs ''
 ```
 
 Get account session:
 
 ```bash
-near view dbio-burn1.testnet get_account_session '{"account_id": "abdulhakim.tesnet"}'
+near view dbio-burn3.testnet get_account_session '{"token_id":"debio-token4.testnet","account_id":"rumaishakhadijah.testnet"}'
 ```
 
 Response
@@ -32,12 +32,17 @@ Response
 }
 ```
 
-Burn
+Use session:
+```bash
+near call dbio-burn3.testnet use_session '{"token_id":"debio-token4.testnet","amount":"1"}' --accountId rumaishakhadijah.testnet
+```
+
+Burn:
 
 ```bash
-near call dbio-burn1.testnet burn '{"amount": "10000"}' --accountId abdulhakim.testnet --depositYocto 1
+near call dbio-burn3.testnet burn '{"token_id":"debio-token4.testnet","amount":"1000000000000000000"}' --accountId rumaishakhadijah.testnet --depositYocto 1
 ```
 
 ENV
-- burn contract: dbio-burn1.testnet, dbio-burn2.testnet
-- token contract: debio-token3.testnet
+- burn contract: dbio-burn1.testnet, dbio-burn2.testnet,dbio-burn3.testnet
+- token contract: debio-token3.testnet, debio-token4.testnet
