@@ -39,7 +39,7 @@ impl Contract {
 	}
 
 	// view
-	pub fn balance_of(&self, token_id: AccountId, account_id: AccountId) -> u128 {
+	pub fn balance_of(&self, token_id: TokenId, account_id: AccountId) -> u128 {
 		match self.accounts.get(&AccountKey(token_id, account_id)) {
 			Some(conversation) => conversation.amount,
 			None => 0,
@@ -47,7 +47,7 @@ impl Contract {
 	}
 
 	// call
-	pub fn converse(&mut self, token_id: AccountId, amount: U128) -> Conversation {
+	pub fn converse(&mut self, token_id: TokenId, amount: U128) -> Conversation {
 		let account_id = env::signer_account_id();
 		let account_key = AccountKey(token_id, account_id);
 
@@ -55,13 +55,12 @@ impl Contract {
 			Some(conversation) => {
 				require!(conversation.amount >= amount.into(), "Insufficient conversation amount");
 
-				let new_amount = conversation
+				let mut conversation = conversation.to_owned();
+
+				conversation.amount = conversation
 					.amount
 					.checked_sub(amount.into())
 					.expect("Overflow conversation amount");
-				let mut conversation = conversation.to_owned();
-
-				conversation.amount = new_amount;
 
 				self.accounts.insert(account_key, conversation);
 
@@ -74,7 +73,7 @@ impl Contract {
 	}
 
 	#[payable]
-	pub fn burn(&mut self, token_id: AccountId, amount: U128) {
+	pub fn burn(&mut self, token_id: TokenId, amount: U128) {
 		assert_one_yocto();
 
 		ext_ft::ext(token_id.clone())

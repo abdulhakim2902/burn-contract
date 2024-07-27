@@ -3,7 +3,7 @@ use crate::*;
 #[near_bindgen]
 impl Contract {
 	#[private]
-	pub fn resolve_burn(&mut self, token_id: AccountId, account_id: AccountId, amount: u128) {
+	pub fn resolve_burn(&mut self, token_id: TokenId, account_id: AccountId, amount: u128) {
 		require!(env::promise_results_count() == 2);
 
 		// Check is token is successfully burned
@@ -34,10 +34,8 @@ impl Contract {
 		// 	.checked_div(u128::pow(10, token_decimals.into()))
 		// 	.expect("Invalid division");
 
-		let total_amount =
+		conversation.amount =
 			conversation.amount.checked_add(amount).expect("Overflow account amount");
-
-		conversation.amount = total_amount;
 
 		self.accounts.insert(account_key, conversation);
 	}
