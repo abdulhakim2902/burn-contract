@@ -6,6 +6,7 @@ impl Contract {
 	pub fn resolve_burn(&mut self, token_id: AccountId, account_id: AccountId, amount: u128) {
 		require!(env::promise_results_count() == 2);
 
+		// Check is token is successfully burned
 		let is_burned = match env::promise_result(0) {
 			PromiseResult::Successful(_) => true,
 			PromiseResult::Failed => false,
@@ -13,32 +14,31 @@ impl Contract {
 
 		require!(is_burned, "Failed to burn token");
 
-		let token_decimals = match env::promise_result(1) {
-			PromiseResult::Successful(val) => match from_slice::<FungibleTokenMetadata>(&val) {
-				Ok(ft_metadata) => ft_metadata.decimals,
-				Err(_) => 18,
-			},
-			PromiseResult::Failed => 18,
+		// // Get the token decimal
+		// let token_decimals = match env::promise_result(1) {
+		// 	PromiseResult::Successful(val) => match from_slice::<FungibleTokenMetadata>(&val) {
+		// 		Ok(ft_metadata) => ft_metadata.decimals,
+		// 		Err(_) => 18,
+		// 	},
+		// 	PromiseResult::Failed => 18,
+		// };
+
+		let account_key = AccountKey(token_id, account_id);
+		let mut conversation = match self.accounts.get(&account_key) {
+			Some(conversation) => conversation.to_owned(),
+			None => Conversation { amount: 0 },
 		};
 
-		let session_key = SessionKey(token_id, account_id);
-		let mut account = match self.accounts.get(&session_key) {
-			Some(account) => account.to_owned(),
-			None => Account { burn_amount: 0, session: 0 },
-		};
+		// // Convert token amount to conversation amount
+		// let conversation_amount = amount
+		// 	.checked_div(u128::pow(10, token_decimals.into()))
+		// 	.expect("Invalid division");
 
-		let converted_session = amount
-			.checked_div(u128::pow(10, token_decimals.into()))
-			.expect("Invalid division");
-		let burn_amount = account.burn_amount.checked_add(amount).expect("Overflow token amount");
-		let total_session = account
-			.session
-			.checked_add(converted_session)
-			.expect("Overflow account session");
+		let total_amount =
+			conversation.amount.checked_add(amount).expect("Overflow account amount");
 
-		account.burn_amount = burn_amount;
-		account.session = total_session;
+		conversation.amount = total_amount;
 
-		self.accounts.insert(session_key, account);
+		self.accounts.insert(account_key, conversation);
 	}
 }

@@ -7,7 +7,7 @@ This contract is used for burning the token (reducing the total supply) without 
 To build run:
 
 ```shell
-./build.sh
+./scripts/build.sh
 ```
 
 ## Deploy
@@ -15,26 +15,23 @@ To build run:
 To deploy run:
 
 ```shell
-near deploy dbio-burn3.testnet out/main.wasm --initFunction new --initArgs ''
+near deploy dbio-burn3.testnet out/burn_token.wasm --initFunction new --initArgs '{}'
 ```
 
-Get account session:
+Get account conversation balance:
 
 ```bash
-near view dbio-burn3.testnet get_account_session '{"token_id":"debio-token4.testnet","account_id":"rumaishakhadijah.testnet"}'
+near view dbio-burn3.testnet balance_of '{"token_id":"debio-token4.testnet","account_id":"rumaishakhadijah.testnet"}'
 ```
 
 Response
 ```bash
-{
-  "burn_amount": 100000000000
-  "session": 100000000000
-}
+10
 ```
 
-Use session:
+Converse:
 ```bash
-near call dbio-burn3.testnet use_session '{"token_id":"debio-token4.testnet","amount":"1"}' --accountId rumaishakhadijah.testnet
+near call dbio-burn3.testnet converse '{"token_id":"debio-token4.testnet","amount":"1"}' --accountId rumaishakhadijah.testnet
 ```
 
 Burn:
@@ -43,6 +40,7 @@ Burn:
 near call dbio-burn3.testnet burn '{"token_id":"debio-token4.testnet","amount":"1000000000000000000"}' --accountId rumaishakhadijah.testnet --depositYocto 1
 ```
 
-ENV
-- burn contract: dbio-burn1.testnet, dbio-burn2.testnet,dbio-burn3.testnet
-- token contract: debio-token3.testnet, debio-token4.testnet
+Testnet
+- burn contract: dbio-burn5.testnet
+- token contract: debio-token4.testnet
+

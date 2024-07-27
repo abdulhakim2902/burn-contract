@@ -15,9 +15,9 @@ pub type TokenId = AccountId;
 	Ord,
 )]
 #[serde(crate = "near_sdk::serde")]
-pub struct SessionKey(pub TokenId, pub AccountId);
+pub struct AccountKey(pub TokenId, pub AccountId);
 
 #[derive(BorshStorageKey, BorshSerialize)]
 pub enum StorageKeys {
-	AccountSession,
+	AccountConversation,
 }
