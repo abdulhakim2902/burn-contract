@@ -14,11 +14,13 @@ pub struct FungibleTokenMetadata {
 
 #[ext_contract(ext_ft)]
 trait WrappedAppchainToken {
-	fn burn(&mut self, account_id: AccountId, amount: U128);
+	fn storage_unregister(&mut self, force: Option<bool>) -> bool;
 	fn ft_metadata() -> FungibleTokenMetadata;
+	fn storage_balance_of(&self, account_id: AccountId) -> Option<StorageBalance>;
 }
 
 #[ext_contract(ext_self)]
 trait BurnResolver {
-	fn resolve_burn(&mut self, token_id: AccountId, account_id: AccountId, amount: u128);
+	fn resolve_burn(&mut self, account_id: AccountId);
+	fn resolve_transfer(&self);
 }

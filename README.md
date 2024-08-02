@@ -23,13 +23,13 @@ To deploy run:
 ```
 Example:
 ```shell
-./scripts/deploy.sh dbio-burn3.testnet testnet
+./scripts/deploy.sh dbio-burn5.testnet testnet
 ```
 
 ### Get account conversation balance:
 
 ```bash
-near view dbio-burn3.testnet balance_of '{"token_id":"debio-token4.testnet","account_id":"rumaishakhadijah.testnet"}'
+near view dbio-burn5.testnet balance_of '{"token_id":"debio-token5.testnet","account_id":"rumaishakhadijah.testnet"}'
 ```
 
 Response
@@ -39,15 +39,18 @@ Response
 
 ### Converse:
 ```bash
-near call dbio-burn3.testnet converse '{"token_id":"debio-token4.testnet","amount":"1"}' --accountId rumaishakhadijah.testnet
+near call dbio-burn5.testnet converse '{"token_id":"debio-token5.testnet","amount":"1000000000000000000"}' --accountId rumaishakhadijah.testnet
 ```
 
 ### Burn token:
 
 ```bash
-near call dbio-burn3.testnet burn '{"token_id":"debio-token4.testnet","amount":"1000000000000000000"}' --accountId rumaishakhadijah.testnet --depositYocto 1
+```bash
+near call debio-token5.testnet storage_deposit '{"account_id":"dbio-burn5.testnet"}' --accountId rumaishakhadijah.testnet --deposit 0.00125
+near call debio-token5.testnet ft_transfer_call '{"receiver_id":"dbio-burn5.testnet", "amount": "1000000000000000000", "msg": ""}' --accountId rumaishakhadijah.testnet --depositYocto 1 --gas 300000000000000
+near call dbio-burn5.testnet burn '{"token_id":"debio-token5.testnet"}' --accountId rumaishakhadijah.testnet --depositYocto 1
 ```
 
 Testnet
 - burn contract: dbio-burn5.testnet
-- token contract: debio-token4.testnet
+- token contract: debio-token5.testnet

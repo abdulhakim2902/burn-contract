@@ -1,42 +1,47 @@
 use crate::*;
+use near_sdk::log;
 
 #[near_bindgen]
 impl Contract {
 	#[private]
-	pub fn resolve_burn(&mut self, token_id: TokenId, account_id: AccountId, amount: u128) {
+	pub fn resolve_burn(&mut self, account_id: AccountId) {
 		require!(env::promise_results_count() == 2);
 
-		// Check is token is successfully burned
-		let is_burned = match env::promise_result(0) {
+		let balance = match env::promise_result(0) {
+			PromiseResult::Successful(val) => match from_slice::<StorageBalance>(&val) {
+				Ok(storage) => storage.total,
+				Err(_) => NearToken::from_near(0),
+			},
+			PromiseResult::Failed => NearToken::from_near(0),
+		};
+
+		log!("Available deposit {}", balance);
+
+		let is_burned = match env::promise_result(1) {
 			PromiseResult::Successful(_) => true,
 			PromiseResult::Failed => false,
 		};
 
-		require!(is_burned, "Failed to burn token");
+		let burn_msg = if is_burned { "Token is burned" } else { "Failed to burn token" };
 
-		// // Get the token decimal
-		// let token_decimals = match env::promise_result(1) {
-		// 	PromiseResult::Successful(val) => match from_slice::<FungibleTokenMetadata>(&val) {
-		// 		Ok(ft_metadata) => ft_metadata.decimals,
-		// 		Err(_) => 18,
-		// 	},
-		// 	PromiseResult::Failed => 18,
-		// };
+		log!("{}", burn_msg);
 
-		let account_key = AccountKey(token_id, account_id);
-		let mut conversation = match self.accounts.get(&account_key) {
-			Some(conversation) => conversation.to_owned(),
-			None => Conversation { amount: 0 },
+		Promise::new(account_id)
+			.transfer(balance.saturating_add(NearToken::from_yoctonear(1)))
+			.then(ext_self::ext(env::current_account_id()).resolve_transfer());
+	}
+
+	#[private]
+	pub fn resolve_transfer(self) {
+		require!(env::promise_results_count() == 1);
+
+		let is_transferred = match env::promise_result(0) {
+			PromiseResult::Successful(_) => true,
+			PromiseResult::Failed => false,
 		};
 
-		// // Convert token amount to conversation amount
-		// let conversation_amount = amount
-		// 	.checked_div(u128::pow(10, token_decimals.into()))
-		// 	.expect("Invalid division");
+		let transfer_msg = if is_transferred { "Refund the deposit" } else { "Transfer failed" };
 
-		conversation.amount =
-			conversation.amount.checked_add(amount).expect("Overflow account amount");
-
-		self.accounts.insert(account_key, conversation);
+		log!("{}", transfer_msg);
 	}
 }

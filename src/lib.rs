@@ -1,16 +1,18 @@
 mod external;
+mod ft_callback;
 mod private;
 mod types;
 
 use near_sdk::{
-	assert_one_yocto,
 	borsh::{BorshDeserialize, BorshSerialize},
 	env, ext_contract,
 	json_types::{Base64VecU8, U128},
-	near_bindgen, require,
+	near, near_bindgen, require,
 	serde::{Deserialize, Serialize},
+	serde_json::from_slice,
 	store::LookupMap,
-	AccountId, BorshStorageKey, Gas, PanicOnDefault, PromiseResult,
+	AccountId, BorshStorageKey, Gas, NearToken, PanicOnDefault, Promise, PromiseOrValue,
+	PromiseResult,
 };
 
 use external::*;
@@ -73,18 +75,21 @@ impl Contract {
 	}
 
 	#[payable]
-	pub fn burn(&mut self, token_id: TokenId, amount: U128) {
-		assert_one_yocto();
+	pub fn burn(&mut self, token_id: TokenId) {
+		let account_id = env::signer_account_id();
 
 		ext_ft::ext(token_id.clone())
-			.with_attached_deposit(env::attached_deposit())
-			.with_static_gas(Gas::from_tgas(1))
-			.burn(env::signer_account_id(), amount)
-			.and(ext_ft::ext(token_id.clone()).ft_metadata())
+			.storage_balance_of(account_id.clone())
+			.and(
+				ext_ft::ext(token_id.clone())
+					.with_attached_deposit(NearToken::from_yoctonear(1))
+					.with_static_gas(Gas::from_tgas(1))
+					.storage_unregister(Some(true)),
+			)
 			.then(
 				ext_self::ext(env::current_account_id())
 					.with_static_gas(Gas::from_tgas(1))
-					.resolve_burn(token_id, env::signer_account_id(), amount.into()),
+					.resolve_burn(account_id),
 			);
 	}
 }

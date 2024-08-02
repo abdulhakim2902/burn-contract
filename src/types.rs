@@ -21,3 +21,9 @@ pub struct AccountKey(pub TokenId, pub AccountId);
 pub enum StorageKeys {
 	AccountConversation,
 }
+
+#[near(serializers=[borsh, json])]
+pub struct StorageBalance {
+	pub total: NearToken,
+	pub available: NearToken,
+}
